@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        ".fantomasignore": "ignore",
         "memory": "cpp",
         "algorithm": "cpp",
         "atomic": "cpp",
@@ -64,6 +65,8 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "array": "cpp",
+        "filesystem": "cpp"
     }
 }

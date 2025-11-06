@@ -1,23 +1,20 @@
 {
-    "configurations": [
-      {
-        "name": "linux-gcc-x64",
-        "includePath": [
-          "${workspaceFolder}/**",
-          "/usr/include",
-          "/usr/local/include",
-          "/usr/include/c++/11",
-          "/usr/include/x86_64-linux-gnu/c++/11",
-          "/usr/local/include/opencv4"
-        ],
-        "compilerPath": "/usr/bin/gcc",
-        "cStandard": "c17",
-        "cppStandard": "c++20",
-        "intelliSenseMode": "linux-gcc-x64",
-        "compilerArgs": [
-          "-I/usr/local/include/opencv4"
-        ]
-      }
-    ],
-    "version": 4
-  }
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/usr/include",
+        "/usr/local/include",
+        "/usr/include/c++/13",
+        "/usr/include/x86_64-linux-gnu/c++/13",
+        "/usr/local/include/opencv4"
+      ],
+      "compilerPath": "/usr/bin/g++-13",
+      "cStandard": "c17",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "linux-gcc-x64"
+    }
+  ],
+  "version": 4
+}

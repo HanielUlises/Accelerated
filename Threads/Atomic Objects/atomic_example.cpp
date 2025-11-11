@@ -2,9 +2,11 @@
 
 #include <thread>
 #include <atomic>    
+#include <iostream>
 
 std::atomic<unsigned int> item_count (0);
 
+std::mutex pencil;
 
 void shopper(){
     pencil.lock();

@@ -1,38 +1,41 @@
-#include <thread>
-#include <mutex>
 #include <iostream>
+#include <mutex>
+#include <thread>
+#include <vector>
 
-unsigned int first_item_count = 0;
-unsigned int second_item_count = 0;
+std::recursive_mutex rm;  
 
-std::recursive_mutex mut;
+unsigned long long factorial(int n) {
+    std::lock_guard<std::recursive_mutex> lock(rm);  
 
-void add_item_1(){
-    mut.lock();
-    first_item_count++;
-    mut.lock();
+    if (n <= 1)
+        return 1;
+
+    return n * factorial(n - 1);
 }
 
-void add_item_2(){
-    mut.lock();
-    second_item_count++;
-    mut.lock();
-}
+int main() {
 
-void modifier(){
-    for(int i = 0; i < 100000; i++){
-        add_item_1();
-        add_item_2();
+    std::cout << "Computing factorial threads\n";
+    
+    std::vector<std::thread> threads;
+
+    for(int i = 0; i < 5; i++){
+        int n = 3 + (i % 3);
+        threads.emplace_back([n](){
+            unsigned long long fact = factorial(n);
+            {
+                std::lock_guard<std::recursive_mutex> lock(rm);
+                std::cout << "Factorial of " << n << " is " << fact << std::endl;
+            }
+
+        });
     }
-}
 
-int main (){
-    std::thread agent_1 (modifier);
-    std::thread agent_2 (modifier);
+    for(auto &thread: threads){
+        thread.join();
+    }
 
-    agent_1.join();
-    agent_2.join();
-
-    std::cout << "First item count \n" << first_item_count;
-    std::cout << "Second item count \n" << second_item_count;
+    std::cout << "\nAll done!\n";
+    return 0;
 }

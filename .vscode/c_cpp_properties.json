@@ -8,7 +8,8 @@
         "/usr/local/include",
         "/usr/include/c++/13",
         "/usr/include/x86_64-linux-gnu/c++/13",
-        "/usr/local/include/opencv4"
+        "/usr/local/include/opencv4",
+        "/usr/include/CL"   
       ],
       "compilerPath": "/usr/bin/g++-13",
       "cStandard": "c17",

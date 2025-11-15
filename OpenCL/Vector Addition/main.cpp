@@ -1,4 +1,4 @@
-#include <CL/cl.hpp>
+#include <CL/opencl.hpp>
 #include <iostream>
 #include <vector>
 #include <fstream>

@@ -67,6 +67,27 @@
         "xutility": "cpp",
         "mutex": "cpp",
         "array": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "cstdarg": "cpp",
+        "cwctype": "cpp",
+        "hash_map": "cpp",
+        "bitset": "cpp",
+        "complex": "cpp",
+        "condition_variable": "cpp",
+        "deque": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_set": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "string_view": "cpp",
+        "numbers": "cpp",
+        "ranges": "cpp",
+        "cinttypes": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "semaphore": "cpp",
+        "__nullptr": "cpp"
     }
 }

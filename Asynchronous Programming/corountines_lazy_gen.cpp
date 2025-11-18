@@ -1,6 +1,7 @@
 #include <coroutine>
 #include <iostream>
 #include <optional>
+#include <chrono>
 
 template<typename T>
 struct Generator {
@@ -34,7 +35,7 @@ struct Generator {
 Generator<int> countdown(int from) {
     for (int i = from; i > 0; --i) {
         co_yield i;
-        std::this_thread::sleep_for(500ms);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }
 

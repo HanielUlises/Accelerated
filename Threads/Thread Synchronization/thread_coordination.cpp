@@ -23,7 +23,7 @@ void fetch_data() {
         // Update data -> Notify progress bar
         std::lock_guard<std::mutex> data_lock(data_mutex);
         s_data += "Block " + std::to_string(i + 1);
-        std::cout << "s_data: " << s_data << std::endl;
+        std::cout << "s_data: " << s_data << " " <<std::endl;
         update_progress = true;
     }
 

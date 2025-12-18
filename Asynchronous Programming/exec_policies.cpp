@@ -40,10 +40,12 @@ int main() {
     auto result = std::transform_reduce(std::execution::par, x.begin(), x.end(), y.begin(), 0);
 
     std::cout << "First vector: \n";
-    for(const auto &i : x) std::cout << i << '\n';
+    for(const auto &i : x) std::cout << i << ' ';
     std::cout << '\n'; 
 
     std::cout << "Second vector: \n";
-    for(const auto &i : y) std::cout << i << '\n';
+    for(const auto &i : y) std::cout << i << ' ';
     std::cout << '\n'; 
+
+    std::cout << "Result from transform op (default): "<< result << '\n';
 }

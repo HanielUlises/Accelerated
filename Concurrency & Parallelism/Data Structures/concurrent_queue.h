@@ -20,43 +20,70 @@ struct concurrent_queue_full : public std::runtime_error {
 };
 
 template <typename T>
-class concurrent_queue{
-        std::mutex mut;
-        std::queue<T> q;
+class concurrent_queue {
+private:
+    mutable std::mutex mut;
+    std::queue<T> q;
+    std::condition_variable cond_not_empty;
+    std::size_t capacity;
+    bool closed{false};
 
-        std::condition_variable cond_var;
+public:
+    explicit concurrent_queue(std::size_t cap = 0) : capacity(cap) {}
 
-        int max{50};
-    
-    public:
-        concurrent_queue() = default;
-        concurrent_queue(int _max) : max(_max) {}
-        concurrent_queue& operator=(const concurrent_queue&) = delete;
-        concurrent_queue(const concurrent_queue&) = delete;
-        concurrent_queue& operator=(const concurrent_queue&&) = delete;
+    concurrent_queue(const concurrent_queue&) = delete;
+    concurrent_queue& operator=(const concurrent_queue&) = delete;
+    concurrent_queue(concurrent_queue&&) = delete;
+    concurrent_queue& operator=(concurrent_queue&&) = delete;
 
-        // Push element
-        void push(T value) {
-            std::unique_lock<std::mutex> uniq_lck(mut);
-            while(q.size() > max) {
-                uniq_lck.unlock();
-                std::this_thread::sleep_for(50ms);
-                uniq_lck.lock();
+    void push(T value) {
+        std::unique_lock<std::mutex> lock(mut);
+        if (closed) {
+            throw std::runtime_error("push to closed queue");
+        }
+        if (capacity > 0) {
+            cond_not_empty.wait(lock, [this] { return q.size() < capacity || closed; });
+            if (closed) return;
+        }
+        q.push(std::move(value));
+        lock.unlock();
+        cond_not_empty.notify_one();
+    }
+
+    void pop(T& value) {
+        std::unique_lock<std::mutex> lock(mut);
+        cond_not_empty.wait(lock, [this] { return !q.empty() || closed; });
+        if (q.empty()) {
+            if (closed) {
+                throw std::runtime_error("pop from closed queue");
             }
-
-            q.push(value);
-            cond_var.notify_one();
+            return;
         }
+        value = std::move(q.front());
+        q.pop();
+        lock.unlock();
+    }
 
-        // Pop element
-        void pop(T &value) {
-            std::unique_lock<std::mutex> lck_grd(mut);
-
-            cond_var.wait(lck_grd, [this] {return !q.empty()});
-
-            value = q.front();
-            q.pop();
+    bool try_pop(T& value) {
+        std::lock_guard<std::mutex> lock(mut);
+        if (q.empty()) {
+            return false;
         }
+        value = std::move(q.front());
+        q.pop();
+        return true;
+    }
+
+    bool empty() const {
+        std::lock_guard<std::mutex> lock(mut);
+        return q.empty();
+    }
+
+    void close() {
+        std::lock_guard<std::mutex> lock(mut);
+        closed = true;
+        cond_not_empty.notify_all();
+    }
 };
 
 #endif

@@ -2,6 +2,8 @@
 #include <condition_variable>
 #include <utility>
 
+
+#ifdef PREDICATIVE
 // Base class providing monitor functionality
 class Monitor {
 protected:
@@ -59,4 +61,28 @@ public:
         std::unique_lock<std::mutex> lock(mtx_);
         return cond_.wait_for(lock, timeout, std::forward<Predicate>(stop_waiting));
     }
+};
+
+#endif
+
+#pragma region Base
+
+template <typename T>
+class Monitor{
+        // The object to be monitored
+        T data;
+
+        // Mutex to protect the data
+        std::mutex data_mut;
+
+    public:
+
+        Monitor<T> (T data = {}) : data(data) {}
+
+        template<typename Func>
+        auto operator() (Func func) {
+            std::lock_guard<std::mutex> lck_grd(data_mut);
+            
+            return func(data);
+        }
 };

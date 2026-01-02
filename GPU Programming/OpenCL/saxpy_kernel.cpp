@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include <CL/cl.hpp>
 
 int main() {
@@ -17,8 +18,9 @@ int main() {
         if (devices.empty()) {
             platform.getDevices(CL_DEVICE_TYPE_CPU, &devices);
         }
-        cl::Device device = devices[0];
+        if (devices.empty()) return 1;
 
+        cl::Device device = devices[0];
         cl::Context context(device);
         cl::CommandQueue queue(context, device);
 
@@ -35,7 +37,13 @@ int main() {
         )";
 
         cl::Program program(context, kernelSource);
-        program.build({device});
+
+        try {
+            program.build({device});
+        } catch (...) {
+            std::cerr << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
+            return 1;
+        }
 
         cl::Kernel kernel(program, "saxpy");
 
@@ -54,12 +62,15 @@ int main() {
         kernel.setArg(3, bufY);
 
         queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(N), cl::NullRange);
+        queue.finish();
         queue.enqueueReadBuffer(bufY, CL_TRUE, 0, sizeof(float) * N, Y.data());
 
         bool ok = true;
         float expected = alpha * 1.0f + 3.0f;
+        const float eps = 1e-6f;
+
         for (int i = 0; i < 10; ++i) {
-            if (Y[i] != expected) {
+            if (std::fabs(Y[i] - expected) > eps) {
                 ok = false;
                 break;
             }

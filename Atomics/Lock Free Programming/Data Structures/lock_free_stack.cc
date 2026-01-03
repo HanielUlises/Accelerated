@@ -1,9 +1,10 @@
 #include <atomic>
-#include <utility>
+#include <thread>
+#include <vector>
+#include <iostream>
 
 template<typename T>
-class LockFreeStack {
-private:
+struct LockFreeStack {
     struct Node {
         T data;
         Node* next;
@@ -13,7 +14,6 @@ private:
 
     std::atomic<Node*> head;
 
-public:
     LockFreeStack() : head(nullptr) {}
     ~LockFreeStack() {
         Node* curr = head.load();
@@ -42,3 +42,35 @@ public:
         } while (!head.compare_exchange_weak(oldHead, newNode));
     }
 };
+
+int main() {
+    LockFreeStack<int> stack;
+
+    const int num_threads = 8;
+    const int pushes_per_thread = 100000;
+
+    auto worker = [&stack]() {
+        for (int i = 0; i < pushes_per_thread; ++i) {
+            stack.push(i);
+        }
+    };
+
+    std::vector<std::thread> threads;
+    for (int i = 0; i < num_threads; ++i) {
+        threads.emplace_back(worker);
+    }
+
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    int count = 0;
+    for (auto* node = stack.head.load(); node != nullptr; node = node->next) {
+        ++count;
+    }
+
+    std::cout << "Total elements pushed: " << num_threads * pushes_per_thread << std::endl;
+    std::cout << "Elements in stack: " << count << std::endl;
+
+    return 0;
+}
